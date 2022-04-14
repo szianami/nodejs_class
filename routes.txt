@@ -1,0 +1,79 @@
+Házimunka-megosztó alkalmazás
+
+index.html 	- login form
+dashboard.html	- user saját taskjait látja, unassigned taskokat
+team.html 	- userekhez rendelt taskok, feladatlista
+task.html	- egy adott task részletes nézete
+edit_task.html	- adott task edit + save formja
+new_task.html	- új task hozzáadását intéző form
+
+
+renderMW.js
+
+middleware/auth/
+	authMW.js
+	checkPassMW.js
+
+middleware/user/
+	getUsersMW.js
+	getUserMW.js
+
+middleware/task/
+	getMyTasksMW.js
+	getUnassignedTasksMW.js
+	getTaskMW.js
+	saveTaskMW.js
+	delTaskMW.js
+
+
+GET, POST  /	index.html, bejelentkező screen
+ 	checkPassMW	-- jelszóellenőrzés ? redirect dashboard.html : index.html
+	renderMW(index.html)
+--------------------------------------------------
+GET  /dashboard	dashboard.html, a saját taskjainkat látjuk & menedzselhetjük
+	authMW,
+	getUser(me),
+	getUnassignedTasks()	-- a még senkihez sem assignolt taskokat kérjük le
+	renderMW(dashboard.html)
+
+GET /dashboard/tasks/:taskid	-- task részletesebb nézete, dashboardról elérve
+	authMW
+	getTaskMW
+	renderMW(task.html)
+
+GET, POST /dashboard/tasks/new/:taskid	-- új task felvétele
+	authMW
+	saveTaskMW -- ha nincs POST paraméterben küldve adat, nextet hív, ha pedig van, 
+		megpróbálja elmenteni -- hiba esetén elteszi az értékeit és nextet 				hív -> elmenti, ha sikerült elmenteni, átirányít a dashboard endpointra
+	renderMW(new_task.html) -- korábbi értéket megőrizve
+
+GET, POST /dashboard/tasks/edit/:taskid
+	authMW
+	getTaskMW
+	saveTaskMW
+	renderMW(edit_task.html)
+
+GET  /dashboard/tasks/del/:taskid
+	authMW 
+	getTaskMW -- létezik-e a törlendő task, ha nincs ilyen, akkor visszairányítani
+	delTaskMW
+-------------------------------------------
+GET  /team	-- a teamen belüli usereket és az általuk vállalt taskokat mutatja
+	authMW
+	getUsersMW
+	renderMW(team.html)
+
+GET  /team/:user/:taskid
+	authMW
+	getTaskMW
+	renderMW(task.html)
+	
+GET, POST  /team/:user/edit/:taskid
+	authMW
+	saveTaskMW
+	renderMW(new_task.html)
+
+GET, POST  /team/:user/del/:taskid
+	authMW 
+	getTaskMW -- létezik-e a törlendő task, ha nincs ilyen, akkor visszairányítani
+	delTaskMW
