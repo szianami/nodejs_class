@@ -12,15 +12,6 @@ const delTaskMW = require('../middleware/task/delTaskMW');
 module.exports = function (app) {
     const objRepo = {};
     
-    app.use('/',
-        checkPassMW(objRepo),
-        renderMW(objRepo, 'index'));
-
-    app.get('/dashboard',
-        authMW(objRepo),
-        getUserMW(objRepo),
-	    getUnassignedTasksMW(objRepo),
-        renderMW(objRepo, 'dashboard'));
     app.get('/dashboard/tasks/:taskid',
         authMW(objRepo),
         getTaskMW(objRepo),
@@ -38,11 +29,18 @@ module.exports = function (app) {
         authMW(objRepo),
         getTaskMW(objRepo),
         delTaskMW(objRepo));
-        
-    app.get('/team',
+    
+    app.get('/dashboard',
         authMW(objRepo),
-        getUsersMW(objRepo),
-        renderMW(objRepo, 'team'));
+        getUserMW(objRepo),
+	    getUnassignedTasksMW(objRepo),
+        renderMW(objRepo, 'dashboard'));
+
+    app.get('/task',
+        authMW(objRepo),
+        getTaskMW(objRepo),
+        renderMW(objRepo, 'task'));
+        
     app.use('/team/:user/:taskid',
         authMW(objRepo),
         getTaskMW(objRepo),
@@ -64,4 +62,13 @@ module.exports = function (app) {
         getUserMW(objRepo),
         getTaskMW(objRepo),
         delTaskMW(objRepo));
+    app.get('/team',
+        authMW(objRepo),
+        getUsersMW(objRepo),
+        renderMW(objRepo, 'team'));
+
+    app.use('/',
+        checkPassMW(objRepo),
+        renderMW(objRepo, 'index'));
+
 }
